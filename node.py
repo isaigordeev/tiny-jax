@@ -8,7 +8,38 @@ class Node:
 
     def __add__(self, other):
         other = other if isinstance(other, Node) else Node(other)
+
         out = Node(self.value + other.value, (self, other), '+')
 
+        def _backward_pass():
+            self.grad += out.grad
+            other.grad += out.grad
+
+        out._backward_function = _backward_pass
+
+        return out
+
+    def __mul__(self, other):
+        other = other if isinstance(other, Node) else Node(other)
+
+        out = Node(self.value * other.value, (self, other), '*')
+
+        def _backward_pass():
+            self.grad += out.grad * other.grad
+            other.grad += out.grad * self.grad
+
+        out._backward_function = _backward_pass
+
+        return out
+
+    def __pow__(self, other):
+        assert isinstance(other, (float, int))
+
+        out = Node(self.value ** other, (self,), f'**{other}')
+
+        def _backward_pass():
+            self.grad += (other*self.value**(other-1)) * out.grad
+
+        out._backward_function = _backward_pass
 
         return out
