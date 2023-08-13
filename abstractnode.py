@@ -1,4 +1,4 @@
-class Node:
+class AbstractNode:
     def __init__(self, value=0, _previous_nodes=(), _operator=None):
         self.value = value
         self.grad = 0
@@ -7,9 +7,9 @@ class Node:
 
 
     def __add__(self, other):
-        other = other if isinstance(other, Node) else Node(other)
+        other = other if isinstance(other, AbstractNode) else AbstractNode(other)
 
-        out = Node(self.value + other.value, (self, other), '+')
+        out = AbstractNode(self.value + other.value, (self, other), '+')
 
         def _backward_pass():
             self.grad += out.grad
@@ -20,9 +20,9 @@ class Node:
         return out
 
     def __mul__(self, other):
-        other = other if isinstance(other, Node) else Node(other)
+        other = other if isinstance(other, AbstractNode) else AbstractNode(other)
 
-        out = Node(self.value * other.value, (self, other), '*')
+        out = AbstractNode(self.value * other.value, (self, other), '*')
 
         def _backward_pass():
             self.grad += out.grad * other.grad
@@ -35,7 +35,7 @@ class Node:
     def __pow__(self, other):
         assert isinstance(other, (float, int))
 
-        out = Node(self.value ** other, (self,), f'**{other}')
+        out = AbstractNode(self.value ** other, (self,), f'**{other}')
 
         def _backward_pass():
             self.grad += (other*self.value**(other-1)) * out.grad
