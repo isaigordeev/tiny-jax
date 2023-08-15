@@ -1,4 +1,4 @@
-from abstractnode import AbstractNode
+from node import AbstractNode
 
 class AbstractActivation(AbstractNode):
     def __init__(self):
