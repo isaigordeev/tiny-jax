@@ -44,3 +44,17 @@ class AbstractNode:
 
         return out
 
+
+    def relu(self):
+
+        self.value = 0 if self.value < 0 else self.value
+
+        out = AbstractNode(self.value, (self,), 'relu')
+
+        def _backward_pass():
+            self.grad += self.value*self.grad
+
+        out._backward_function = _backward_pass()
+
+        return out
+
