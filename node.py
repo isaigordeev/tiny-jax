@@ -52,9 +52,51 @@ class AbstractNode:
         out = AbstractNode(self.value, (self,), 'relu')
 
         def _backward_pass():
-            self.grad += self.value*self.grad
+            self.grad += out.value*out.grad
 
         out._backward_function = _backward_pass()
 
         return out
 
+
+    def backward(self):
+
+        topo = []
+        visited = set()
+        def build_order(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build_order(child)
+                topo.append(v)
+
+        build_order(self)
+
+        self.grad = 1
+        for v in reversed(topo):
+            v._backward_function()
+
+
+    def __neg__(self): 
+        return self * -1
+    
+    def __radd__(self, other):
+        return self + other
+
+    def __sub__(self, other): 
+        return self + (-other)
+
+    def __rsub__(self, other): 
+        return other + (-self)
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __truediv__(self, other):
+        return self * other**-1
+
+    def __rtruediv__(self, other): 
+        return other * self**-1
+
+    def __repr__(self):
+        return f"Value(data={self.data}, grad={self.grad})"
